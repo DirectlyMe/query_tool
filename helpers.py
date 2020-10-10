@@ -10,14 +10,14 @@ def get_connections(conn_file: str = 'databases.yaml') -> dict:
 
 
 # get the db password from a file
-def get_db_pass(db_name: str, master_pass: str):
+def get_db_pass(db_name: str, master_pass: str) -> str:
     with open(f'./program_creds/{db_name}_creds', 'rb') as f:
         return decrypt_password(f.read(), master_pass).decode('utf-8')
 
 
 # encrypt a password with a master password and an optional salt
 # place the encrypted password in your database.yaml file
-def encrypt_password(password: str, master_pass: str, salt: str = 'LSAO195161lasoII') -> str:
+def encrypt_password(password: str, master_pass: str, salt: str = 'LSAO195161lasoII') -> bytes:
     hkey = hash_key(master_pass)
     pass_obj = AES.new(hkey, AES.MODE_CFB, salt.encode("utf-8"))
     # encrypt the key and return it
@@ -34,6 +34,6 @@ def decrypt_password(encrypted_pass: str, master_pass: str, salt: str = 'LSAO195
 
 
 # turn a key in to a 16 byte hash
-def hash_key(key: str):
+def hash_key(key: str) -> bytes:
     hash_obj = SHA256.new(key.encode('utf-8'))    
     return hash_obj.digest()

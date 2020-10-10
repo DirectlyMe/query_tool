@@ -1,4 +1,5 @@
 import yaml
+import keyring
 import psycopg2 as pg
 import pandas as pd
 from helpers import get_db_pass
@@ -7,7 +8,10 @@ from helpers import get_db_pass
 # encapsulate a database connection
 class DatabaseConnection:
     # constructor
-    def __init__(self, connection_info, master_pass = ''):
+    def __init__(self, connection_info, master_pass = keyring.get_password('system', 'query_tool')):
+        if (not master_pass):
+            print('master password not in keyring, must be provided in constructor.')
+
         self.master_pass = master_pass
         self.connection, self.cursor = self.establish_connection(connection_info)
     
