@@ -1,29 +1,14 @@
 import yaml
 import psycopg2 as pg
 import pandas as pd
-import base64
-from Crypto.Cipher import AES
-from Crypto.Random import get_random_bytes
-from Crypto.Protocol.KDF import PBKDF2
-
-
-# pull database connections from a yaml file 
-def get_connections(connections_file: str = 'databases.yaml') -> dict:
-    with open(connections_file) as f:
-        return  yaml.load(f, Loader=yaml.FullLoader)
-
-
-# encrypt your passwords
-def encrypt_password(password: str):
-    salt  = b'\x91\x98)2\xe5\x9b\x91S\x90\xbd\xe6\xb4\x15\xf7\x93&Q\xe9PV\xf4\x15r\xcdPa\xca]\xb3\xfb'
-    key = PBKDF2(password, salt, dkLen=32) # Your key that you can encrypt with
-    print(key)
+from helpers import get_db_pass
 
 
 # encapsulate a database connection
 class DatabaseConnection:
     # constructor
-    def __init__(self, connection_info):
+    def __init__(self, connection_info, master_pass = ''):
+        self.master_pass = master_pass
         self.connection, self.cursor = self.establish_connection(connection_info)
     
 
@@ -42,7 +27,7 @@ class DatabaseConnection:
         try:
             est_connection = pg.connect(
                 user = connection["user"],
-                password = connection["pass"],
+                password = get_db_pass(connection["db_name"], self.master_pass),
                 host = connection["url"],
                 port = connection["port"],
                 database = connection["db_name"])
@@ -64,8 +49,8 @@ class DatabaseConnection:
     # provide a helper for a select statement
     def select(self, query: str, pandas = True):
         try:
-            if ("SELECT" not in query or "select" not in query):
-                 return
+            # if ("SELECT" not in query or "select" not in query):
+            #      return
 
             # execute the query and get all rows
             self.cursor.execute(query)

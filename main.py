@@ -1,9 +1,12 @@
-from connections import get_connections, DatabaseConnection, encrypt_password
+from connections import DatabaseConnection
+from helpers import get_connections
 
 
 def main():
     databases = get_connections()
-    connection = DatabaseConnection(databases["Hermes"])
+    
+    # pass in your master pass as the second param
+    connection = DatabaseConnection(databases["Hermes"], 'Test')
 
     results = connection.select(
         """
