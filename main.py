@@ -3,13 +3,12 @@ from helpers import get_connections
 
 
 def main():
-    #master_pass = input('What is your master password (if you don\'t have one run setup.py): ')
     databases = get_connections()
 
-    # pass in your master pass as the second param
-    connection = DatabaseConnection(databases["Hermes"])
+    hermes_connection = DatabaseConnection(databases["Hermes"])
+    migra_connection = DatabaseConnection(databases["Migranova"])
 
-    results = connection.select(
+    results = hermes_connection.select(
         """
             SELECT *
             FROM contents

@@ -10,9 +10,10 @@ class DatabaseConnection:
     # constructor
     def __init__(self, connection_info, master_pass = keyring.get_password('system', 'query_tool')):
         if (not master_pass):
-            print('master password not in keyring, must be provided in constructor.')
+            self.master_pass = input('Enter master password: ')
+        else:
+            self.master_pass = master_pass
 
-        self.master_pass = master_pass
         self.connection, self.cursor = self.establish_connection(connection_info)
     
 
@@ -53,8 +54,8 @@ class DatabaseConnection:
     # provide a helper for a select statement
     def select(self, query: str, pandas = True):
         try:
-            # if ("SELECT" not in query or "select" not in query):
-            #      return
+            # TODO: add query string validation
+            # make sure its actually a select statement
 
             # execute the query and get all rows
             self.cursor.execute(query)
