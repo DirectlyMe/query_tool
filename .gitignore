@@ -1,2 +1,5 @@
 databases.yaml
 program_creds/*
+Pipfile.lock
+__pycache__
+.vscode
