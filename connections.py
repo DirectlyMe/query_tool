@@ -8,15 +8,20 @@ from helpers import get_db_pass
 # encapsulate a database connection
 class DatabaseConnection:
     # constructor
-    def __init__(self, connection_info, master_pass = keyring.get_password('system', 'query_tool')):
-        if (not master_pass):
-            self.master_pass = input('Enter master password: ')
+    def __init__(self, connection_info, **kwargs):
+        # if they did provide a password use it
+        if (kwargs['master_pass']):
+            self.master_pass = kwargs['master_pass']
+        # if nothing was provided try to get the password from the keychain
+        elif (keyring.get_password('socialchorus_query_tool', 'master_pass')):
+            self.master_pass = keyring.get_password('socialchorus_query_tool', 'master_pass')
+        # prompt the user for the password if we have nothing to use
         else:
-            self.master_pass = master_pass
+            self.master_pass = input('Enter master password: ')
 
         self.connection, self.cursor = self.establish_connection(connection_info)
     
-
+    # for 'with' instantiation
     def __enter__(self):
         return self
 
@@ -74,7 +79,7 @@ class DatabaseConnection:
         return pd.DataFrame(query_results, columns=colnames)
 
 
-    # join two dataframes helper
+    # join two dataframes
     # keys must be unique identifiers
     def join(self, df_one: pd.DataFrame, df_two: pd.DataFrame, df_one_key: str, df_two_key: str) -> pd.DataFrame:
         return df_one.set_index(df_one_key).join(df_two.set_index(df_two_key))

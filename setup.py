@@ -1,13 +1,13 @@
 import keyring
 import os
+import argparse
 from helpers import get_connections, encrypt_password, get_db_pass
 
 
 # let the user configure the query tool
-def setup(**kwargs):
+def setup(args):
     # read all of the databases from the yaml file
-    connections = get_connections(
-        kwargs['connfile']) if 'conn_file' in kwargs.values() else get_connections()
+    connections = get_connections(args.db_file) if args.db_file else get_connections()
 
     # make sure the directory that stores the credentials exists
     if (not os.path.isdir('./program_creds')):
@@ -20,7 +20,7 @@ def setup(**kwargs):
 
     # store the
     if (str.lower(input('Would you like to store your master password in your OS\'s keychain? (y/n): ')) == 'y'):
-        keyring.set_password('system', 'query_tool', master_pass)
+        keyring.set_password('socialchorus_query_tool', 'master_pass', master_pass)
 
     # get and encrypt the password for each database
     for conn, values in connections.items():
@@ -46,4 +46,7 @@ def setup(**kwargs):
 
 
 if __name__ == "__main__":
-    setup()
+    parser = argparse.ArgumentParser(description='Process some integers.')
+    parser.add_argument('--db_file', type=str, help='path to database config file')
+    args = parser.parse_args()
+    setup(args)
